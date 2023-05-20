@@ -22,7 +22,6 @@ services:
              gunicorn server.wsgi:application --bind 0.0.0.0:8000"
     volumes:
       - static_volume:/home/app/static
-      - media_volume:/home/app/media
     ports:
       - 8000:8000
     env_file:
@@ -85,7 +84,6 @@ services:
     restart: always
     volumes:
       - static_volume:/home/app/static
-      - media_volume:/home/app/media
     ports:
       - 80:80
     depends_on:
