@@ -1,0 +1,96 @@
+version: "3.9"
+
+services:
+
+  db:
+    image: postgres:15
+    restart: always
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    env_file:
+      - ./.env
+
+  web:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    restart: always
+    command: >
+      sh -c "python manage.py collectstatic --noinput &&
+             python manage.py makemigrations &&
+             python manage.py migrate &&
+             gunicorn server.wsgi:application --bind 0.0.0.0:8000"
+    volumes:
+      - static_volume:/home/app/static
+      - media_volume:/home/app/media
+    ports:
+      - 8000:8000
+    env_file:
+      - ./.env
+    depends_on:
+      - db
+
+  redis:
+    image: redis
+    restart: always
+    volumes:
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+    ports:
+      - 6379:6379
+
+  celery:
+    build: .
+    command: celery -A server worker -l info
+    volumes:
+      - .:/app
+    depends_on:
+      - redis
+    env_file:
+      - ./.env
+      
+  celery_beat:
+    build: .
+    command: celery -A server beat -l info
+    volumes:
+      - .:/app
+    depends_on:
+      - redis
+    env_file:
+      - ./.env
+
+  # nginx:
+  #   build: ./nginx
+  #   restart: always
+  #   command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+  #   volumes:
+  #     - static_volume:/home/app/static
+  #     - media_volume:/home/app/media
+  #     - ./data/certbot/conf:/etc/letsencrypt
+  #     - ./data/certbot/www:/var/www/certbot
+  #   ports:
+  #     - 80:80
+  #     - 443:443
+  #   depends_on:
+  #     - web
+
+  # certbot:
+  #   image: certbot/certbot
+  #   entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+  #   volumes:
+  #     - ./data/certbot/conf:/etc/letsencrypt
+  #     - ./data/certbot/www:/var/www/certbot
+
+  nginx:
+    build: ./nginx
+    restart: always
+    volumes:
+      - static_volume:/home/app/static
+      - media_volume:/home/app/media
+    ports:
+      - 80:80
+    depends_on:
+      - web
+
+volumes:
+  postgres_data:
+  static_volume:
