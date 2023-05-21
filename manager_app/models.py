@@ -86,7 +86,7 @@ class Transaction(models.Model):
     status = models.CharField(max_length=50, null=True, blank=True, default="")
     order_id = models.CharField(max_length=255, null=True, blank=True, default="")
     liqpay_order_id = models.CharField(max_length=255, null=True, blank=True, default="")
-    payment_id = models.IntegerField(default=0)
+    payment_id = models.CharField(max_length=255, null=True, blank=True, default="")
     ip = models.CharField(max_length=50, null=True, blank=True, default="")
     description = models.TextField(null=True, blank=True, default="")
 
