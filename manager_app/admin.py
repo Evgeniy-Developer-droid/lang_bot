@@ -4,8 +4,30 @@ from django.utils.translation import gettext_lazy as _
 from manager_app.models import *
 
 
+class TransactionAdmin(admin.ModelAdmin):
+    list_display = (
+        'order_id', 'amount',
+        'currency', 'paytype',
+        'status', 'liqpay_order_id',
+        'payment_id', 'ip',
+        'created',
+    )
+    ordering = ('-created',)
+    search_fields = ('order_id', 'liqpay_order_id', 'payment_id',)
+
+admin.site.register(Transaction, TransactionAdmin)
+
+
+class TemporalyTokenAdmin(admin.ModelAdmin):
+    list_display = ('key', 'name', 'value',)
+    ordering = ('-created',)
+    search_fields = ('key', 'name', 'value',)
+
+admin.site.register(TemporalyToken, TemporalyTokenAdmin)
+
+
 class SubNowAdmin(admin.ModelAdmin):
-    list_display = ('user', 'sub', 'end', 'active',)
+    list_display = ('user', 'sub', 'promo_code', 'price', 'end', 'active', 'created')
     ordering = ('-created',)
 
 admin.site.register(SubNow, SubNowAdmin)

@@ -42,19 +42,19 @@ def add_word_hand(message):
         bot.register_next_step_handler(msg, input_add_word)
     else:
         markup.add(
-            telebot.types.InlineKeyboardButton("Вибрати підписку", callback_data="sb_new")
+            telebot.types.InlineKeyboardButton("\U0001F4DC Вибрати підписку", callback_data="sb_new")
         )
-        bot.send_message(message.chat.id, f"У вас не має жодної активної підписки!", reply_markup=markup)
+        bot.send_message(message.chat.id, f"У вас не має жодної активної підписки! \U0001F614", reply_markup=markup)
 
 def input_add_word(message):
     data = message.text.split("/")
     if len(data) != 2:
-        msg = bot.send_message(message.chat.id, f"Помилка. Не правильний формат!")
+        msg = bot.send_message(message.chat.id, f"\U0000274C Помилка. Не правильний формат!")
         bot.register_next_step_handler(msg, input_add_word)
     else:
         # add to db
         add_word_to_dict(word=data[0], translate=data[1], chat_id=message.chat.id)
-        bot.send_message(message.chat.id, f"Вітаю! Ви успішно додали новий запис до свого словника.")
+        bot.send_message(message.chat.id, f"Вітаю! \U0001F389 Ви успішно додали новий запис до свого словника.")
 
 @bot.message_handler(commands=['subscription'])
 def subscription_hand(message):
@@ -71,9 +71,16 @@ def subscription_hand(message):
     else:
         markup.row_width = 1
         markup.add(
-            telebot.types.InlineKeyboardButton("Вибрати підписку", callback_data="sb_new")
+            telebot.types.InlineKeyboardButton("\U0001F4DC Вибрати підписку", callback_data="sb_new")
         )
-        bot.send_message(message.chat.id, f"У вас не має жодної активної підписки!", reply_markup=markup)
+        bot.send_message(message.chat.id, f"У вас не має жодної активної підписки!\U0001F614", reply_markup=markup)
+
+@bot.message_handler(commands=['help'])
+def help_handler(message):
+    user = message.from_user
+    user_instance = get_or_create_user(user)
+    message = "Після обрання рівня підписки, кожного ранку я бути присилати тобі список слів. Впродовж дня я буду перевіряти тебе згідно цих слів. Бажаю тобі успіху!"
+    bot.send_message(message.chat.id, message)
 
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
@@ -87,7 +94,9 @@ def send_welcome(message):
         ],
         scope=telebot.types.BotCommandScopeChat(message.chat.id)
     )
-    bot.send_message(message.chat.id, f"Привіт {user.first_name or ''}!")
+    message = f"Привіт {user.first_name or ''} \U0001F600!\n"
+    message += "Я бот який допоможе тобі з вивченням англійської мови \U0001F1EC.\nПісля обрання рівня підписки, кожного ранку я бути присилати тобі список слів. Впродовж дня я буду перевіряти тебе згідно цих слів. Бажаю тобі успіху!"
+    bot.send_message(message.chat.id, message)
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback_query(call):
@@ -97,10 +106,7 @@ def callback_query(call):
         for sub_instance in get_subscriptions():
             markup.add(
                 telebot.types.InlineKeyboardButton(
-                    f"""
-                    {sub_instance['name']} - {sub_instance['price']} грн \n
-                    Період: {sub_instance['period_value']} {sub_instance['period']}
-                    """,
+                    f"""\U00002B50 {sub_instance['name']} {sub_instance['price']} грн""",
                     callback_data=f"sb_select|id:{sub_instance['id']}"
                 )
             )
@@ -110,7 +116,7 @@ def callback_query(call):
         sub_selected_id = int(call.data.split("|")[1].split(":")[1])
         chat_id = call.message.chat.id
         markup.add(
-            telebot.types.InlineKeyboardButton("Банківська картка", callback_data=f"sb_payment|id:{sub_selected_id}|liqpay"),
+            telebot.types.InlineKeyboardButton("\U0001F4B3 Банківська картка", callback_data=f"sb_payment|id:{sub_selected_id}|liqpay"),
         )
         bot.send_message(call.message.chat.id, f"Виберіть спосіб оплати.", reply_markup=markup)
 
@@ -122,7 +128,7 @@ def callback_query(call):
         # set subscription without pay
         sub_now_id = set_subscription(chat_id, sub_selected_id)
         markup.add(
-            telebot.types.InlineKeyboardButton("Використати Промо код", callback_data=f"sb_promocode|sub_now_id:{sub_now_id}|{payment_method}"),
+            telebot.types.InlineKeyboardButton("\U000026AA Використати Промо код", callback_data=f"sb_promocode|sub_now_id:{sub_now_id}|{payment_method}"),
         )
         link = create_payment(sub_now_id)
         bot.send_message(call.message.chat.id, f"Перейдіть за посиланням і сплатіть або використайте промокод. {link}", reply_markup=markup)
@@ -142,6 +148,8 @@ def challenge_answer(message):
     r.delete(str(message.chat.id)+'_answer')
 
 def enter_promo_code(message):
+    if message.text == "#":
+        return None
     promo = use_promocode(message.text, message.chat.id)
     if not promo:
         msg = bot.send_message(message.chat.id, f"Промокод не знайдено, спробуйте знову, або напишіть # щоб відмінити.")

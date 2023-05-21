@@ -10,6 +10,8 @@ class TemporalyToken(models.Model):
     name = models.CharField(max_length=255, null=True, blank=True, default="")
     value = models.CharField(max_length=255, null=True, blank=True, default="")
 
+    def __str__(self) -> str:
+        return self.key
 
 
 class PromoCode(models.Model):
@@ -31,17 +33,15 @@ class PromoCode(models.Model):
 
 class Subscription(models.Model):
     PERIOD = (
-        ('day', 'Day',),
-        ('week', 'Week',),
         ('month', 'Month',),
     )
     created = models.DateTimeField(auto_now_add=True)
     key = models.UUIDField(default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255)
     price = models.FloatField(default=0.0)
-    period = models.CharField(max_length=10, choices=PERIOD, default="day")
+    period = models.CharField(max_length=10, choices=PERIOD, default="month")
     period_value = models.IntegerField(default=1)
-    max_words = models.IntegerField(default=3)
+    max_words = models.IntegerField(default=5)
     description = models.TextField(default="", blank=True, null=True)
 
     def __str__(self) -> str:
@@ -53,6 +53,9 @@ class User(AbstractUser):
     user_id = models.CharField(max_length=255, unique=True, default=uuid.uuid4)
     language_code = models.CharField(max_length=255, default="en")
     is_premium = models.BooleanField(default=False)
+
+    def __str__(self) -> str:
+        return self.user_id
 
 
 class SubNow(models.Model):
@@ -72,3 +75,20 @@ class History(models.Model):
     target = models.CharField(max_length=255, default="", null=True, blank=True)
     value = models.CharField(max_length=255, default="", null=True, blank=True)
     meta = models.TextField(default="{}", null=True, blank=True)
+
+
+class Transaction(models.Model):
+    created = models.DateTimeField(auto_now_add=True)
+    amount = models.FloatField(default=0.0)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="transactions")
+    currency = models.CharField(max_length=50, null=True, blank=True, default="")
+    paytype = models.CharField(max_length=50, null=True, blank=True, default="")
+    status = models.CharField(max_length=50, null=True, blank=True, default="")
+    order_id = models.CharField(max_length=255, null=True, blank=True, default="")
+    liqpay_order_id = models.CharField(max_length=255, null=True, blank=True, default="")
+    payment_id = models.IntegerField(default=0)
+    ip = models.CharField(max_length=50, null=True, blank=True, default="")
+    description = models.TextField(null=True, blank=True, default="")
+
+    def __str__(self) -> str:
+        return self.order_id

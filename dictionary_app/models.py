@@ -8,6 +8,9 @@ class Word(models.Model):
     word = models.CharField(max_length=500)
     translate = models.CharField(max_length=500)
 
+    def __str__(self) -> str:
+        return f"{self.word} - {self.translate}"
+
 
 class Challenge(models.Model):
     created = models.DateTimeField(auto_now_add=True)
@@ -15,3 +18,6 @@ class Challenge(models.Model):
     word = models.ForeignKey(Word, on_delete=models.CASCADE, related_name="word_chellenges")
     date_send = models.DateTimeField()
     deadline_send = models.DateTimeField()
+
+    def __str__(self) -> str:
+        return f"{self.user} - {self.date_send}"
