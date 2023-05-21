@@ -14,11 +14,10 @@ import telebot
 from django.http import HttpResponse
 from django.core.exceptions import PermissionDenied
 from django.views.decorators.csrf import csrf_exempt
-import requests
 
 
 bot = telebot.TeleBot(os.environ.get("BOT_KEY"))
-r = redis.Redis(host="127.0.0.1", port=6379, decode_responses=True)
+r = redis.Redis(host="redis", port=6379, decode_responses=True)
 
 
 @csrf_exempt

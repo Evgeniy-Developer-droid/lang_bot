@@ -1,6 +1,7 @@
 import django
 import os
 from django.conf import settings
+from django.utils import timezone
 from datetime import datetime, timedelta
 from bot.payment import pay_link_generate
 
@@ -59,7 +60,7 @@ def set_subscription(chat_id, sub_id):
     user = User.objects.get(user_id=str(chat_id))
     sub = Subscription.objects.get(pk=sub_id)
 
-    end = datetime.now()
+    end = timezone.now()
 
     if sub.period == 'day':
         end = end + timedelta(days=sub.period_value)
