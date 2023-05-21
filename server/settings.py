@@ -11,6 +11,7 @@ DEBUG = bool(int(os.environ.get("DEBUG", 1)))
 USE_SQL_FILE_DATABASE = bool(int(os.environ.get("USE_SQL_FILE_DATABASE", 0)))
 
 ALLOWED_HOSTS = ["*"]
+CSRF_TRUSTED_ORIGINS = ['https://bot-lang6436.online']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
