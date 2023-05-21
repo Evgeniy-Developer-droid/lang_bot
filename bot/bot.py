@@ -18,7 +18,7 @@ import requests
 
 
 bot = telebot.TeleBot(os.environ.get("BOT_KEY"))
-r = redis.Redis(host=os.environ.get("REDIS_HOST"), port=os.environ.get("REDIS_PORT"), decode_responses=True)
+r = redis.Redis(host="127.0.0.1", port=6379, decode_responses=True)
 
 
 @csrf_exempt
@@ -149,10 +149,6 @@ def enter_promo_code(message):
         bot.register_next_step_handler(msg, enter_promo_code)
     else:
         bot.send_message(message.chat.id, f"Перейдіть за посиланням і сплатіть. {promo}")
-
-
-requests.get(f"https://api.telegram.org/bot{os.environ.get('BOT_KEY')}/setWebhook")
-requests.get(f"https://api.telegram.org/bot{os.environ.get('BOT_KEY')}/setWebhook?url={os.environ.get('SERVER_URL')}/manager/webhook/{os.environ.get('BOT_KEY')}/")
 
 
 def main():
