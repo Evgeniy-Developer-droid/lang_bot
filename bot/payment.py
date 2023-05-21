@@ -10,7 +10,7 @@ def pay_link_generate(amount, description, token, order_id):
         params = {
             'action': 'pay',
             'currency': 'UAH',
-            'order_id': token,
+            'order_id': str(token),
             'version': '3',
             'amount': amount,
             'description': description,
