@@ -79,8 +79,8 @@ def subscription_hand(message):
 def help_handler(message):
     user = message.from_user
     user_instance = get_or_create_user(user)
-    message = "Після обрання рівня підписки, кожного ранку я бути присилати тобі список слів. Впродовж дня я буду перевіряти тебе згідно цих слів. Бажаю тобі успіху!"
-    bot.send_message(message.chat.id, message)
+    msg = "Після обрання рівня підписки, кожного ранку я бути присилати тобі список слів. Впродовж дня я буду перевіряти тебе згідно цих слів. Бажаю тобі успіху!"
+    bot.send_message(message.chat.id, msg)
 
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
@@ -94,9 +94,9 @@ def send_welcome(message):
         ],
         scope=telebot.types.BotCommandScopeChat(message.chat.id)
     )
-    message = f"Привіт {user.first_name or ''} \U0001F600!\n"
-    # message += "Я бот який допоможе тобі з вивченням англійської мови \U0001F1EC.\nПісля обрання рівня підписки, кожного ранку я бути присилати тобі список слів. Впродовж дня я буду перевіряти тебе згідно цих слів. Бажаю тобі успіху!"
-    bot.send_message(message.chat.id, message)
+    msg = f"Привіт {user.first_name or ''} \U0001F600!\n"
+    msg += "Я бот який допоможе тобі з вивченням англійської мови \U0001F1EC.\nПісля обрання рівня підписки, кожного ранку я бути присилати тобі список слів. Впродовж дня я буду перевіряти тебе згідно цих слів. Бажаю тобі успіху!"
+    bot.send_message(message.chat.id, msg)
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback_query(call):
