@@ -24,7 +24,7 @@ def morning_word_list_task():
         deadline_time = 1 * 60 * 60 # 1 hour
         max_words = sub.sub.max_words
 
-        id_list = Word.objects.filter().values_list('id', flat=True)
+        id_list = Word.objects.filter(published=True).values_list('id', flat=True)
         random_id_list = random.sample(list(id_list), max_words)
         queryset = Word.objects.filter(id__in=random_id_list)
 
@@ -47,7 +47,7 @@ def morning_word_list_task():
 
 @app.task
 def challenge_task():
-    challenges = Challenge.objects.filter()
+    challenges = Challenge.objects.all()
     for challenge in challenges:
         if timezone.now() > challenge.deadline_send:
             challenge.delete()
