@@ -54,7 +54,7 @@ def input_add_word(message):
     else:
         # add to db
         add_word_to_dict(word=data[0], translate=data[1], chat_id=message.chat.id)
-        bot.send_message(message.chat.id, f"Вітаю! \U0001F389 Ви успішно додали новий запис до свого словника.")
+        bot.send_message(message.chat.id, f"Вітаю! \U0001F389 Ви успішно додали новий запис до словника.")
 
 @bot.message_handler(commands=['subscription'])
 def subscription_hand(message):
@@ -67,7 +67,7 @@ def subscription_hand(message):
         markup.add(
             telebot.types.InlineKeyboardButton("Змінити підписку", callback_data="sb_new")
         )
-        bot.send_message(message.chat.id, f"""{subscription['name']} \nСтарт підписки - {subscription['start']} \nКінець підписки - {subscription['end']} """, reply_markup=markup)
+        bot.send_message(message.chat.id, f"""{subscription['name']} \nСтарт підписки - {subscription['start'].strftime("%d/%m/%Y")} \nКінець підписки - {subscription['end'].strftime("%d/%m/%Y")} """, reply_markup=markup)
     else:
         markup.row_width = 1
         markup.add(

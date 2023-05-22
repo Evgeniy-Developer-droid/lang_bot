@@ -20,7 +20,8 @@ def add_word_to_dict(word, translate, chat_id):
     Word.objects.create(
         user=user,
         word=word,
-        translate=translate
+        translate=translate,
+        published=False
     )
 
 def get_temp_subscription(user):
