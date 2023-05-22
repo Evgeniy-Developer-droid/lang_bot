@@ -141,7 +141,7 @@ def callback_query(call):
         right_answer = call.data.split('|')[2]
         r.set(str(call.message.chat.id)+'_answer', right_answer)
         msg = bot.send_message(call.message.chat.id, f"Напишіть вашу відповідь:")
-        bot.register_next_step_handler(msg, enter_promo_code)
+        bot.register_next_step_handler(msg, challenge_answer)
 
 def challenge_answer(message):
     bot.send_message(message.chat.id, f"Ваша відповідь - {message.text}\nВірна відповідь - {r.get(str(message.chat.id)+'_answer')}")
