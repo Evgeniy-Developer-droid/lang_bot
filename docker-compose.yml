@@ -33,6 +33,7 @@ services:
   redis:
     image: redis
     restart: always
+    command: redis-server --appendonly yes --replica-read-only no
     volumes:
       - ./redis.conf:/usr/local/etc/redis/redis.conf
     ports:
