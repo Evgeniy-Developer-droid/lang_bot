@@ -36,7 +36,8 @@ class Word(models.Model):
 class Challenge(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_chellenges")
-    word = models.ForeignKey(Word, on_delete=models.CASCADE, related_name="word_chellenges")
+    word = models.ForeignKey(Word, on_delete=models.CASCADE, related_name="word_chellenges", null=True, blank=True)
+    phrase = models.ForeignKey(Phrase, on_delete=models.CASCADE, related_name="phrase_chellenges", null=True, blank=True)
     date_send = models.DateTimeField()
     deadline_send = models.DateTimeField()
 

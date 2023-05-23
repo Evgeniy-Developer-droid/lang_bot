@@ -30,31 +30,31 @@ def bot_webhook(request):
     else:
         raise PermissionDenied
 
-@bot.message_handler(commands=['add_word'])
-def add_word_hand(message):
-    user = message.from_user
-    user_instance = get_or_create_user(user)
-    subscription = get_now_subscription(user_instance)
-    markup = telebot.types.InlineKeyboardMarkup()
-    markup.row_width = 1
-    if subscription:
-        msg = bot.send_message(message.chat.id, f"""Укажіть нове слово або словосполучення і його переклад у форматі Англійська/Українська. \nНаприклад Dog/Пес або I like cars/Мені подобаються автомобілі""")
-        bot.register_next_step_handler(msg, input_add_word)
-    else:
-        markup.add(
-            telebot.types.InlineKeyboardButton("\U0001F4DC Вибрати підписку", callback_data="sb_new")
-        )
-        bot.send_message(message.chat.id, f"У вас не має жодної активної підписки! \U0001F614", reply_markup=markup)
+# @bot.message_handler(commands=['add_word'])
+# def add_word_hand(message):
+#     user = message.from_user
+#     user_instance = get_or_create_user(user)
+#     subscription = get_now_subscription(user_instance)
+#     markup = telebot.types.InlineKeyboardMarkup()
+#     markup.row_width = 1
+#     if subscription:
+#         msg = bot.send_message(message.chat.id, f"""Укажіть нове слово або словосполучення і його переклад у форматі Англійська/Українська. \nНаприклад Dog/Пес або I like cars/Мені подобаються автомобілі""")
+#         bot.register_next_step_handler(msg, input_add_word)
+#     else:
+#         markup.add(
+#             telebot.types.InlineKeyboardButton("\U0001F4DC Вибрати підписку", callback_data="sb_new")
+#         )
+#         bot.send_message(message.chat.id, f"У вас не має жодної активної підписки! \U0001F614", reply_markup=markup)
 
-def input_add_word(message):
-    data = message.text.split("/")
-    if len(data) != 2:
-        msg = bot.send_message(message.chat.id, f"\U0000274C Помилка. Не правильний формат!")
-        bot.register_next_step_handler(msg, input_add_word)
-    else:
-        # add to db
-        add_word_to_dict(word=data[0], translate=data[1], chat_id=message.chat.id)
-        bot.send_message(message.chat.id, f"Вітаю! \U0001F389 Ви успішно додали новий запис до словника.")
+# def input_add_word(message):
+#     data = message.text.split("/")
+#     if len(data) != 2:
+#         msg = bot.send_message(message.chat.id, f"\U0000274C Помилка. Не правильний формат!")
+#         bot.register_next_step_handler(msg, input_add_word)
+#     else:
+#         # add to db
+#         add_word_to_dict(word=data[0], translate=data[1], chat_id=message.chat.id)
+#         bot.send_message(message.chat.id, f"Вітаю! \U0001F389 Ви успішно додали новий запис до словника.")
 
 @bot.message_handler(commands=['subscription'])
 def subscription_hand(message):
@@ -89,7 +89,7 @@ def send_welcome(message):
     bot.set_my_commands(
         commands=[
             telebot.types.BotCommand('/subscription', 'Підписки'),
-            telebot.types.BotCommand('/add_word', 'Додати в словник'),
+            # telebot.types.BotCommand('/add_word', 'Додати в словник'),
             telebot.types.BotCommand('/help', 'Допомога'),
         ],
         scope=telebot.types.BotCommandScopeChat(message.chat.id)

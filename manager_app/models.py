@@ -42,6 +42,7 @@ class Subscription(models.Model):
     period = models.CharField(max_length=10, choices=PERIOD, default="month")
     period_value = models.IntegerField(default=1)
     max_words = models.IntegerField(default=5)
+    max_phrases = models.IntegerField(default=5)
     description = models.TextField(default="", blank=True, null=True)
 
     def __str__(self) -> str:
