@@ -12,7 +12,7 @@ app.config_from_object('django.conf:settings', namespace='CELERY')
 app.conf.beat_schedule = {
     'challenge': {
         'task': 'bot.tasks.challenge_task',
-        'schedule': crontab(hour='9-21', minute="*/1")
+        'schedule': crontab(minute="*/1")
     },
     'morning_word_list': {
         'task': 'bot.tasks.morning_word_list_task',
