@@ -8,9 +8,13 @@ from manager_app.models import *
 from dictionary_app.models import *
 from django.utils import timezone
 from manager_tools import logs_autoclear
-import logging
+# import logging
+from manager_tools import Logger
 
-logger = logging.getLogger(__name__)
+
+# logger = logging.getLogger(__name__)
+logger_instance = Logger("celery_task")
+logger = logger_instance.get_logger()
 
 
 bot = telebot.TeleBot(os.environ.get("BOT_KEY"))
@@ -55,23 +59,23 @@ def morning_word_list_task():
                 date_send=timezone.now()+timedelta(seconds=count_challenge_time),
                 deadline_send=timezone.now()+timedelta(seconds=count_challenge_time+deadline_time),
             )
-        message = "Доброго ранку! Сьогодні маємо такий список для практики:"
-        res = bot.send_message(str(sub.user.user_id), message)
-        logger.info(res)
+        try:
+            message = "Доброго ранку! Сьогодні маємо такий список для практики:"
+            bot.send_message(str(sub.user.user_id), message)
 
-        message_w = "||"
-        for item_w in queryset:
-            message_w += f"{item_w.word} \- {item_w.translate}\n"
-        message_w += "||"
-        res = bot.send_message(str(sub.user.user_id), message_w, parse_mode='MarkdownV2')
-        logger.info(res)
+            message_w = "||"
+            for item_w in queryset:
+                message_w += f"{item_w.word} \- {item_w.translate}\n"
+            message_w += "||"
+            bot.send_message(str(sub.user.user_id), message_w, parse_mode='MarkdownV2')
 
-        message_p = "||"
-        for item_p in queryset_p:
-            message_p += f"{item_p.phrase} \- {item_p.translate}\n"
-        message_p += "||"
-        res = bot.send_message(str(sub.user.user_id), message_p, parse_mode='MarkdownV2')
-        logger.info(res)
+            message_p = "||"
+            for item_p in queryset_p:
+                message_p += f"{item_p.phrase} \- {item_p.translate}\n"
+            message_p += "||"
+            bot.send_message(str(sub.user.user_id), message_p, parse_mode='MarkdownV2')
+        except Exception as e:
+            logger.error("morning_word_list_task  "+str(e))
 
 @app.task
 def challenge_task():
@@ -85,35 +89,37 @@ def challenge_task():
             markup = telebot.types.InlineKeyboardMarkup()
             markup.row_width = 1
             ch = random.choice(['e', 'u'])
-            if ch == 'e':
-                if challenge.word:
-                    markup.add(
-                        telebot.types.InlineKeyboardButton("Перевести", callback_data=f"answer|e|{challenge.word.word}")
-                    )
-                    res = bot.send_message(str(challenge.user.user_id),
-                                    f"Завдання. Переведіть на англійську: {challenge.word.translate}", 
-                                    reply_markup=markup)
+            try:
+                if ch == 'e':
+                    if challenge.word:
+                        markup.add(
+                            telebot.types.InlineKeyboardButton("Перевести", callback_data=f"answer|e|{challenge.word.word}")
+                        )
+                        bot.send_message(str(challenge.user.user_id),
+                                        f"Завдання. Переведіть на англійську: {challenge.word.translate}", 
+                                        reply_markup=markup)
+                    else:
+                        markup.add(
+                            telebot.types.InlineKeyboardButton("Перевести", callback_data=f"answer|e|{challenge.phrase.phrase}")
+                        )
+                        bot.send_message(str(challenge.user.user_id),
+                                        f"Завдання. Переведіть на англійську: {challenge.phrase.translate}", 
+                                        reply_markup=markup)
                 else:
-                    markup.add(
-                        telebot.types.InlineKeyboardButton("Перевести", callback_data=f"answer|e|{challenge.phrase.phrase}")
-                    )
-                    res = bot.send_message(str(challenge.user.user_id),
-                                    f"Завдання. Переведіть на англійську: {challenge.phrase.translate}", 
-                                    reply_markup=markup)
-            else:
-                if challenge.word:
-                    markup.add(
-                        telebot.types.InlineKeyboardButton("Перевести", callback_data=f"answer|u|{challenge.word.translate}")
-                    )
-                    res = bot.send_message(str(challenge.user.user_id),
-                                    f"Завдання. Переведіть на українську: {challenge.word.word}", 
-                                    reply_markup=markup)
-                else:
-                    markup.add(
-                        telebot.types.InlineKeyboardButton("Перевести", callback_data=f"answer|u|{challenge.phrase.translate}")
-                    )
-                    res = bot.send_message(str(challenge.user.user_id),
-                                    f"Завдання. Переведіть на українську: {challenge.phrase.phrase}", 
-                                    reply_markup=markup)
-            logger.info(res)
+                    if challenge.word:
+                        markup.add(
+                            telebot.types.InlineKeyboardButton("Перевести", callback_data=f"answer|u|{challenge.word.translate}")
+                        )
+                        bot.send_message(str(challenge.user.user_id),
+                                        f"Завдання. Переведіть на українську: {challenge.word.word}", 
+                                        reply_markup=markup)
+                    else:
+                        markup.add(
+                            telebot.types.InlineKeyboardButton("Перевести", callback_data=f"answer|u|{challenge.phrase.translate}")
+                        )
+                        bot.send_message(str(challenge.user.user_id),
+                                        f"Завдання. Переведіть на українську: {challenge.phrase.phrase}", 
+                                        reply_markup=markup)
+            except Exception as e:  
+                logger.error("challenge_task "+str(e))
             challenge.delete()
