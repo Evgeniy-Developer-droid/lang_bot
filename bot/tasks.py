@@ -18,6 +18,7 @@ bot = telebot.TeleBot(os.environ.get("BOT_KEY"))
 
 @app.task
 def morning_word_list_task():
+    logger.info("morning word list task")
     active_subs = SubNow.objects.filter(active=True)
     for sub in active_subs:
         if sub.end < timezone.now():
@@ -55,23 +56,27 @@ def morning_word_list_task():
                 deadline_send=timezone.now()+timedelta(seconds=count_challenge_time+deadline_time),
             )
         message = "Доброго ранку! Сьогодні маємо такий список для практики:"
-        bot.send_message(str(sub.user.user_id), message)
+        res = bot.send_message(str(sub.user.user_id), message)
+        logger.info(res)
 
         message_w = "||"
         for item_w in queryset:
             message_w += f"{item_w.word} \- {item_w.translate}\n"
         message_w += "||"
-        bot.send_message(str(sub.user.user_id), message_w, parse_mode='MarkdownV2')
+        res = bot.send_message(str(sub.user.user_id), message_w, parse_mode='MarkdownV2')
+        logger.info(res)
 
         message_p = "||"
         for item_p in queryset_p:
             message_p += f"{item_p.phrase} \- {item_p.translate}\n"
         message_p += "||"
-        bot.send_message(str(sub.user.user_id), message_p, parse_mode='MarkdownV2')
+        res = bot.send_message(str(sub.user.user_id), message_p, parse_mode='MarkdownV2')
+        logger.info(res)
 
 @app.task
 def challenge_task():
     logs_autoclear()
+    logger.info("Challenge task")
     challenges = Challenge.objects.all()
     for challenge in challenges:
         if timezone.now() > challenge.deadline_send:
@@ -85,14 +90,14 @@ def challenge_task():
                     markup.add(
                         telebot.types.InlineKeyboardButton("Перевести", callback_data=f"answer|e|{challenge.word.word}")
                     )
-                    bot.send_message(str(challenge.user.user_id),
+                    res = bot.send_message(str(challenge.user.user_id),
                                     f"Завдання. Переведіть на англійську: {challenge.word.translate}", 
                                     reply_markup=markup)
                 else:
                     markup.add(
                         telebot.types.InlineKeyboardButton("Перевести", callback_data=f"answer|e|{challenge.phrase.phrase}")
                     )
-                    bot.send_message(str(challenge.user.user_id),
+                    res = bot.send_message(str(challenge.user.user_id),
                                     f"Завдання. Переведіть на англійську: {challenge.phrase.translate}", 
                                     reply_markup=markup)
             else:
@@ -100,14 +105,15 @@ def challenge_task():
                     markup.add(
                         telebot.types.InlineKeyboardButton("Перевести", callback_data=f"answer|u|{challenge.word.translate}")
                     )
-                    bot.send_message(str(challenge.user.user_id),
+                    res = bot.send_message(str(challenge.user.user_id),
                                     f"Завдання. Переведіть на українську: {challenge.word.word}", 
                                     reply_markup=markup)
                 else:
                     markup.add(
                         telebot.types.InlineKeyboardButton("Перевести", callback_data=f"answer|u|{challenge.phrase.translate}")
                     )
-                    bot.send_message(str(challenge.user.user_id),
+                    res = bot.send_message(str(challenge.user.user_id),
                                     f"Завдання. Переведіть на українську: {challenge.phrase.phrase}", 
                                     reply_markup=markup)
+            logger.info(res)
             challenge.delete()
