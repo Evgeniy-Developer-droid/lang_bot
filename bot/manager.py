@@ -4,6 +4,9 @@ from django.conf import settings
 from django.utils import timezone
 from datetime import datetime, timedelta
 from bot.payment import pay_link_generate
+import logging
+
+logger = logging.getLogger(__name__)
 
 if bool(int(os.environ.get("DEBUG", "1"))):
     try:

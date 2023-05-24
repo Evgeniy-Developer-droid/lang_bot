@@ -1,8 +1,10 @@
 from liqpay.liqpay3 import LiqPay
 import os
 import sys
+import logging
 
-sys.stdout.flush()
+logger = logging.getLogger(__name__)
+
 
 def pay_link_generate(amount, description, token, order_id):
     try:
@@ -22,5 +24,6 @@ def pay_link_generate(amount, description, token, order_id):
         link = f"https://www.liqpay.ua/api/3/checkout?data={data}&signature={signature}"
         return link
     except Exception as e:
-        print("liqpay ", e, flush=True)
+        logger.critical("Liqpay error")
+        logger.error(str(e))
         return ""

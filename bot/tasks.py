@@ -7,6 +7,10 @@ from datetime import datetime, timedelta
 from manager_app.models import *
 from dictionary_app.models import *
 from django.utils import timezone
+from manager_tools import logs_autoclear
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 bot = telebot.TeleBot(os.environ.get("BOT_KEY"))
@@ -32,36 +36,42 @@ def morning_word_list_task():
         queryset_p = Phrase.objects.filter(id__in=random_id_list_p)
 
         count_challenge_time = 0
-        for item in queryset:
+        for item_wi in queryset:
             next_part_time = int(challenge_time_period / (sub.sub.max_words + sub.sub.max_phrases)) - 10
             count_challenge_time += next_part_time
             Challenge.objects.create(
                 user=sub.user,
-                word=item,
+                word=item_wi,
                 date_send=timezone.now()+timedelta(seconds=count_challenge_time),
                 deadline_send=timezone.now()+timedelta(seconds=count_challenge_time+deadline_time),
             )
-        for item in queryset_p:
+        for item_pi in queryset_p:
             next_part_time = int(challenge_time_period / (sub.sub.max_words + sub.sub.max_phrases)) - 10
             count_challenge_time += next_part_time
             Challenge.objects.create(
                 user=sub.user,
-                phrase=item,
+                phrase=item_pi,
                 date_send=timezone.now()+timedelta(seconds=count_challenge_time),
                 deadline_send=timezone.now()+timedelta(seconds=count_challenge_time+deadline_time),
             )
-        message = "Доброго ранку\! Сьогодні маємо такий список слів для практики:\n"
-        message += "||"
-        for item in queryset:
-            message += f"{item.word} \- {item.translate}\n"
-        message += "\n"
-        for item in queryset_p:
-            message += f"{item.phrase} \- {item.translate}\n"
-        message += "||"
-        bot.send_message(str(sub.user.user_id), message, parse_mode='MarkdownV2')
+        message = "Доброго ранку! Сьогодні маємо такий список для практики:"
+        bot.send_message(str(sub.user.user_id), message)
+
+        message_w = "||"
+        for item_w in queryset:
+            message_w += f"{item_w.word} \- {item_w.translate}\n"
+        message_w += "||"
+        bot.send_message(str(sub.user.user_id), message_w, parse_mode='MarkdownV2')
+
+        message_p = "||"
+        for item_p in queryset_p:
+            message_p += f"{item_p.phrase} \- {item_p.translate}\n"
+        message_p += "||"
+        bot.send_message(str(sub.user.user_id), message_p, parse_mode='MarkdownV2')
 
 @app.task
 def challenge_task():
+    logs_autoclear()
     challenges = Challenge.objects.all()
     for challenge in challenges:
         if timezone.now() > challenge.deadline_send:

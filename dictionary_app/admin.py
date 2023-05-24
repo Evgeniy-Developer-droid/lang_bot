@@ -10,7 +10,7 @@ admin.site.register(Phrase, PhraseAdmin)
 
 
 class ChallengeAdmin(admin.ModelAdmin):
-    list_display = ('word', 'user', 'date_send', 'deadline_send', 'created',)
+    list_display = ('word', 'phrase', 'user', 'date_send', 'deadline_send', 'created',)
     ordering = ('-created',)
 
 admin.site.register(Challenge, ChallengeAdmin)

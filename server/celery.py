@@ -16,7 +16,7 @@ app.conf.beat_schedule = {
     },
     'morning_word_list': {
         'task': 'bot.tasks.morning_word_list_task',
-        'schedule': crontab(minute=0, hour='9')
+        'schedule': crontab(minute=0, hour=9)
     },
 }
 
