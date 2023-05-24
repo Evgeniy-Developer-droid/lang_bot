@@ -9,12 +9,15 @@ from dictionary_app.models import *
 from django.utils import timezone
 from manager_tools import logs_autoclear
 # import logging
-from manager_tools import Logger
+# from manager_tools import Logger
+import sys
+
+sys.stdout.flush()
 
 
 # logger = logging.getLogger(__name__)
-logger_instance = Logger("celery_task")
-logger = logger_instance.get_logger()
+# logger_instance = Logger("celery_task")
+# logger = logger_instance.get_logger()
 
 
 bot = telebot.TeleBot(os.environ.get("BOT_KEY"))
@@ -22,7 +25,6 @@ bot = telebot.TeleBot(os.environ.get("BOT_KEY"))
 
 @app.task
 def morning_word_list_task():
-    logger.info("morning word list task")
     active_subs = SubNow.objects.filter(active=True)
     for sub in active_subs:
         if sub.end < timezone.now():
@@ -75,12 +77,10 @@ def morning_word_list_task():
             message_p += "||"
             bot.send_message(str(sub.user.user_id), message_p, parse_mode='MarkdownV2')
         except Exception as e:
-            logger.error("morning_word_list_task  "+str(e))
+            print("morning_word_list_task  "+str(e), flush=True)
 
 @app.task
 def challenge_task():
-    logs_autoclear()
-    logger.info("Challenge task")
     challenges = Challenge.objects.all()
     for challenge in challenges:
         if timezone.now() > challenge.deadline_send:
@@ -121,5 +121,5 @@ def challenge_task():
                                         f"Завдання. Переведіть на українську: {challenge.phrase.phrase}", 
                                         reply_markup=markup)
             except Exception as e:  
-                logger.error("challenge_task "+str(e))
+                print("challenge_task "+str(e), flush=True)
             challenge.delete()

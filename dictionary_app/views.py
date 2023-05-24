@@ -5,9 +5,9 @@ from bot.tasks import morning_word_list_task, challenge_task
 from dictionary_app.models import Word
 import json
 import os
-import logging
+# import logging
 
-logger = logging.getLogger(__name__)
+# logger = logging.getLogger(__name__)
 
 
 @csrf_exempt
@@ -36,14 +36,14 @@ def test(r):
 
 def get_logs(request):
     data = []
-    with open('logs.log', 'r') as f:
-        for line in f.readlines():
-            if line.startswith("WARNING"):
-                data.append({'type': "warning", "data": line})
-            elif line.startswith("CRITICAL"):
-                data.append({'type': "critical", "data": line})
-            elif line.startswith("ERROR"):
-                data.append({'type': "error", "data": line})
-            else:
-                data.append({'type': "info", "data": line})
+    # with open('logs.log', 'r') as f:
+    #     for line in f.readlines():
+    #         if line.startswith("WARNING"):
+    #             data.append({'type': "warning", "data": line})
+    #         elif line.startswith("CRITICAL"):
+    #             data.append({'type': "critical", "data": line})
+    #         elif line.startswith("ERROR"):
+    #             data.append({'type': "error", "data": line})
+    #         else:
+    #             data.append({'type': "info", "data": line})
     return render(request, 'logs.html', {'data': data})
