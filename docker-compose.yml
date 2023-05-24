@@ -41,6 +41,7 @@ services:
 
   celery:
     build: .
+    restart: always
     command: celery -A server worker -l info
     volumes:
       - .:/app
@@ -51,6 +52,7 @@ services:
       
   celery_beat:
     build: .
+    restart: always
     command: celery -A server beat -l info
     volumes:
       - .:/app

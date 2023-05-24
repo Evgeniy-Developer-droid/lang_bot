@@ -14,10 +14,11 @@ import telebot
 from django.http import HttpResponse
 from django.core.exceptions import PermissionDenied
 from django.views.decorators.csrf import csrf_exempt
+from manager_tools import setKey, deleteKey, getKey
 
 
 bot = telebot.TeleBot(os.environ.get("BOT_KEY"))
-r = redis.Redis(host="redis", port=6379, decode_responses=True)
+# r = redis.Redis(host="redis", port=6379, decode_responses=True)
 
 
 @csrf_exempt
@@ -139,13 +140,13 @@ def callback_query(call):
     
     if call.data.startswith("answer"):
         right_answer = call.data.split('|')[2]
-        r.set(str(call.message.chat.id)+'_answer', right_answer)
+        setKey(str(call.message.chat.id)+'_answer', right_answer)
         msg = bot.send_message(call.message.chat.id, f"Напишіть вашу відповідь:")
         bot.register_next_step_handler(msg, challenge_answer)
 
 def challenge_answer(message):
-    bot.send_message(message.chat.id, f"Ваша відповідь - {message.text}\nВірна відповідь - {r.get(str(message.chat.id)+'_answer')}")
-    r.delete(str(message.chat.id)+'_answer')
+    bot.send_message(message.chat.id, f"Ваша відповідь - {message.text}\nВірна відповідь - {getKey(str(message.chat.id)+'_answer')}")
+    deleteKey(str(message.chat.id)+'_answer')
 
 def enter_promo_code(message):
     if message.text == "#":
