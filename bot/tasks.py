@@ -30,6 +30,11 @@ def morning_word_list_task():
         if sub.end < timezone.now():
             sub.active = False
             sub.save()
+            try:
+                message = "Термін дії вашої підписки заківчився! Оформіть підписку знову."
+                bot.send_message(str(sub.user.user_id), message)
+            except Exception as e:
+                pass
             continue
         challenge_time_period = 12 * 60 * 60  # 12 hours
         deadline_time = 1 * 60 * 60 # 1 hour

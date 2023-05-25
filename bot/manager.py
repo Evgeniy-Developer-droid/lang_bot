@@ -72,12 +72,13 @@ def set_subscription(chat_id, sub_id):
         end = end + timedelta(weeks=sub.period_value)
     else:
         end = end + timedelta(days=sub.period_value * 30)
-
+    active = "free" in sub.description
     inst = SubNow.objects.create(
         user=user,
         sub=sub,
         end=end,
-        price=sub.price
+        price=sub.price,
+        active=active
     )
     return inst.pk
 
@@ -90,6 +91,9 @@ def get_subscriptions():
             "name": item.name,
             "price": item.price,
             "period": item.period,
+            "max_words": item.max_words,
+            "max_phrases": item.max_phrases,
+            "desc": item.description,
             "period_value": item.period_value
         } for item in instances
     ]

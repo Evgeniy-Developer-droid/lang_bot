@@ -83,6 +83,14 @@ def help_handler(message):
     msg = "Після обрання рівня підписки, кожного ранку я бути присилати тобі список слів. Впродовж дня я буду перевіряти тебе згідно цих слів. Бажаю тобі успіху!"
     bot.send_message(message.chat.id, msg)
 
+@bot.message_handler(commands=['info'])
+def info_hand(message):
+    msg = f"Якщо у вас виникли проблеми, додаткові запитання можете написати мені.\n"
+    msg += f"Linkedin: https://www.linkedin.com/in/evgeny-grinchak/ \n"
+    msg += f"Facebook: https://www.facebook.com/profile.php?id=100068917465287 \n"
+    msg += f"Instagram: https://www.instagram.com/evgen_grnk/ \n"
+    bot.send_message(message.chat.id, msg)
+
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
     user = message.from_user
@@ -90,6 +98,7 @@ def send_welcome(message):
     bot.set_my_commands(
         commands=[
             telebot.types.BotCommand('/subscription', 'Підписки'),
+            telebot.types.BotCommand('/info', 'Контакти розробника'),
             # telebot.types.BotCommand('/add_word', 'Додати в словник'),
             telebot.types.BotCommand('/help', 'Допомога'),
         ],
@@ -104,18 +113,29 @@ def callback_query(call):
     markup = telebot.types.InlineKeyboardMarkup()
     markup.row_width = 1
     if call.data == "sb_new":
+        msg_answer = f"Виберіть рівень підписки.\n"
         for sub_instance in get_subscriptions():
             markup.add(
                 telebot.types.InlineKeyboardButton(
                     f"""\U00002B50 {sub_instance['name']} {sub_instance['price']} грн""",
-                    callback_data=f"sb_select|id:{sub_instance['id']}"
+                    callback_data=f"sb_select|id:{sub_instance['id']}|{sub_instance['desc']}"
                 )
             )
-        bot.send_message(call.message.chat.id, f"Виберіть рівень підписки.", reply_markup=markup)
+            msg_answer += "\n"
+            msg_answer += f"{sub_instance['name']}\n"
+            msg_answer += f"Ціна: {sub_instance['price']} грн.\n"
+            msg_answer += f"Період: 30 днів.\n"
+            msg_answer += f"Слів: {sub_instance['max_words']}.\n"
+            msg_answer += f"Словосполучень: {sub_instance['max_phrases']}.\n"
+        bot.send_message(call.message.chat.id, msg_answer, reply_markup=markup)
     
     if call.data.startswith("sb_select"):
         sub_selected_id = int(call.data.split("|")[1].split(":")[1])
+        desc = call.data.split("|")[2]
         chat_id = call.message.chat.id
+        if "free" in desc:
+            bot.send_message(call.message.chat.id, f"Дякую, що вибрати безкоштовну підписку! Кожного ранку я бути присилати тобі список слів. Впродовж дня я буду перевіряти тебе згідно цих слів. Бажаю тобі успіху!")
+            return None
         markup.add(
             telebot.types.InlineKeyboardButton("\U0001F4B3 Банківська картка", callback_data=f"sb_payment|id:{sub_selected_id}|liqpay"),
         )
