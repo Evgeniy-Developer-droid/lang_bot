@@ -2,6 +2,13 @@ import logging
 import os
 from django.core.cache import cache
 
+
+def markdown_filter(message):
+    symbols = ['_', '*', '[', ']', '(', ')', '~', '`', '>', '#', '+', ' -', '=', '|', '{', '}', '.', '!']
+    for symbol in symbols:
+        message.replace(symbol, f'\{symbol}')
+    return message
+
 # This function increase value by one
 def incrKey(key, value, timeout=None):
     return cache.incr(key, delta=value)

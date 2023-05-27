@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from manager_app.models import *
 from dictionary_app.models import *
 from django.utils import timezone
-from manager_tools import logs_autoclear
+from manager_tools import markdown_filter
 # import logging
 # from manager_tools import Logger
 import sys
@@ -70,17 +70,15 @@ def morning_word_list_task():
             message = "Доброго ранку! Сьогодні маємо такий список для практики:"
             bot.send_message(str(sub.user.user_id), message)
 
-            message_w = "||"
+            message_w = ""
             for item_w in queryset:
-                message_w += f"{item_w.word} \- {item_w.translate}\n"
-            message_w += "||"
-            bot.send_message(str(sub.user.user_id), message_w, parse_mode='MarkdownV2')
+                message_w += f"{item_w.word} - {item_w.translate}\n"
+            bot.send_message(str(sub.user.user_id), f'||{markdown_filter(message_w)}||', parse_mode='MarkdownV2')
 
-            message_p = "||"
+            message_p = ""
             for item_p in queryset_p:
-                message_p += f"{item_p.phrase} \- {item_p.translate}\n"
-            message_p += "||"
-            bot.send_message(str(sub.user.user_id), message_p, parse_mode='MarkdownV2')
+                message_p += f"{item_p.phrase} - {item_p.translate}\n"
+            bot.send_message(str(sub.user.user_id), f'||{markdown_filter(message_p)}||', parse_mode='MarkdownV2')
         except Exception as e:
             print("morning_word_list_task  "+str(e), flush=True)
 
