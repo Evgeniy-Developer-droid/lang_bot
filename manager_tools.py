@@ -4,9 +4,10 @@ from django.core.cache import cache
 
 
 def markdown_filter(message):
-    symbols = ['_', '*', '[', ']', '(', ')', '~', '`', '>', '#', '+', ' -', '=', '|', '{', '}', '.', '!']
+    symbols = ['_', '*', '[', ']', '(', ')', '~', '`', 
+               '>', '#', '+', '-', '=', '|', '{', '}', '.', '!']
     for symbol in symbols:
-        message.replace(symbol, f'\{symbol}')
+        message = message.replace(symbol, f'\{symbol}')
     return message
 
 # This function increase value by one
