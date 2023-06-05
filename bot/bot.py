@@ -135,7 +135,7 @@ def callback_query(call):
         chat_id = call.message.chat.id
         if "free" in desc:
             set_subscription(chat_id, sub_selected_id)
-            bot.send_message(call.message.chat.id, f"Дякую, що вибрати безкоштовну підписку! Кожного ранку я бути присилати тобі список слів. Впродовж дня я буду перевіряти тебе згідно цих слів. Бажаю тобі успіху!")
+            bot.send_message(call.message.chat.id, f"Дякую, що обрали безкоштовну підписку! Кожного ранку я бути присилати тобі список слів. Впродовж дня я буду перевіряти тебе згідно цих слів. Бажаю тобі успіху!")
             return None
         markup.add(
             telebot.types.InlineKeyboardButton("\U0001F4B3 Банківська картка", callback_data=f"sb_payment|id:{sub_selected_id}|liqpay"),

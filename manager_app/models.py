@@ -78,6 +78,13 @@ class History(models.Model):
     meta = models.TextField(default="{}", null=True, blank=True)
 
 
+class Log(models.Model):
+    created = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=255, default="", null=True, blank=True)
+    source = models.CharField(max_length=255, default="", null=True, blank=True)
+    value = models.TextField(default="", null=True, blank=True)
+
+
 class Transaction(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     amount = models.FloatField(default=0.0)

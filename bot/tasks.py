@@ -3,21 +3,14 @@ import os
 import random
 import telebot
 from server.celery import app
-from datetime import datetime, timedelta
+from datetime import timedelta
 from manager_app.models import *
 from dictionary_app.models import *
 from django.utils import timezone
 from manager_tools import markdown_filter
-# import logging
-# from manager_tools import Logger
 import sys
 
 sys.stdout.flush()
-
-
-# logger = logging.getLogger(__name__)
-# logger_instance = Logger("celery_task")
-# logger = logger_instance.get_logger()
 
 
 bot = telebot.TeleBot(os.environ.get("BOT_KEY"))
@@ -34,7 +27,11 @@ def morning_word_list_task():
                 message = "Термін дії вашої підписки заківчився! Оформіть підписку знову."
                 bot.send_message(str(sub.user.user_id), message)
             except Exception as e:
-                pass
+                Log.objects.create(
+                    source="bot/tasks.py/morning_word_list_task()",
+                    status="info",
+                    value=f"{str(e)} - user:{str(sub.user.user_id)}"
+                )
             continue
         challenge_time_period = 12 * 60 * 60  # 12 hours
         deadline_time = 1 * 60 * 60 # 1 hour
@@ -80,7 +77,12 @@ def morning_word_list_task():
                 message_p += f"{item_p.phrase} - {item_p.translate}\n"
             bot.send_message(str(sub.user.user_id), f'||{markdown_filter(message_p)}||', parse_mode='MarkdownV2')
         except Exception as e:
-            print("morning_word_list_task  "+str(e), flush=True)
+            # print("morning_word_list_task  "+str(e), flush=True)
+            Log.objects.create(
+                source="bot/tasks.py/morning_word_list_task()",
+                status="info",
+                value=f"{str(e)} - user:{str(sub.user.user_id)}"
+            )
 
 @app.task
 def challenge_task():
@@ -124,5 +126,9 @@ def challenge_task():
                                         f"Завдання. Переведіть на українську: {challenge.phrase.phrase}", 
                                         reply_markup=markup)
             except Exception as e:  
-                print("challenge_task "+str(e), flush=True)
+                Log.objects.create(
+                    source="bot/tasks.py/morning_word_list_task()",
+                    status="info",
+                    value=f"{str(e)} - user:{str(challenge.user.user_id)}"
+                )
             challenge.delete()

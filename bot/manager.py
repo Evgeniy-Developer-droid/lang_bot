@@ -73,6 +73,8 @@ def set_subscription(chat_id, sub_id):
     else:
         end = end + timedelta(days=sub.period_value * 30)
     active = "free" in sub.description
+    if active:
+        SubNow.objects.filter(user=user, active=True).update(active=False)
     inst = SubNow.objects.create(
         user=user,
         sub=sub,

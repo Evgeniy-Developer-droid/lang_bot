@@ -6,7 +6,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.conf import settings
 from liqpay.liqpay3 import LiqPay
-from manager_app.models import SubNow, TemporalyToken, Transaction
+from manager_app.models import Log, SubNow, TemporalyToken, Transaction
 import os
 import telebot
 
@@ -48,8 +48,15 @@ class PayCallbackView(View):
             sub.active = True
             sub.save()
             bot = telebot.TeleBot(os.environ.get("BOT_KEY"))
-            message = f"Успішна сплата підписки.\n Order id - {response['order_id']}"
-            bot.send_message(str(sub.user.user_id), message)
+            try:
+                message = f"Успішна сплата підписки.\n Order id - {response['order_id']}"
+                bot.send_message(str(sub.user.user_id), message)
+            except Exception as e:
+                Log.objects.create(
+                    source="manager_app/views.py/class PayCallbackView(View):",
+                    status="info",
+                    value=f"{str(e)} - user:{str(sub.user.user_id)}"
+                )
 
         create_transaction(response, sub)
 

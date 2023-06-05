@@ -4,6 +4,17 @@ from django.utils.translation import gettext_lazy as _
 from manager_app.models import *
 
 
+class LogAdmin(admin.ModelAdmin):
+    list_display = (
+        'status', 'value',
+        'source',
+        'created',
+    )
+    ordering = ('-created',)
+
+admin.site.register(Log, LogAdmin)
+
+
 class TransactionAdmin(admin.ModelAdmin):
     list_display = (
         'order_id', 'amount',
